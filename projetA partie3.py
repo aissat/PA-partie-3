@@ -26,8 +26,6 @@ class NetworkFrame:
                 self.w-radius*2,
                 self.h-radius*2
             )
-        #ne doit pas être ici
-        self.nbr_people = nbr_people
         
         for i in range(nbr_people):
             coor_x = \
