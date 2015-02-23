@@ -28,8 +28,12 @@ class NetworkFrame:
                 self.w-radius*2,
                 self.h-radius*2
             )
+<<<<<<< HEAD
             
         #Je passe les ronds qui représente les gens du réseau
+=======
+        
+>>>>>>> 8ee04261a3cf9edc9f10508f6a2715c1952e09ef
         for i in range(nbr_people):
             coor_x = \
                 self.w/2 - ((self.w-radius*4)/2 * 
