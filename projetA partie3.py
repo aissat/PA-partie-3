@@ -4,6 +4,8 @@ from math import *
 
 class NetworkFrame:
     def __init__(self, parent, w_canvas, h_canvas, r_canvas):
+        self.r_canvas = r_canvas
+        self.center_node = []
         self.parent = parent
         self.radius = IntVar()
         self.radius.set(r_canvas)
@@ -26,26 +28,86 @@ class NetworkFrame:
                 self.w-radius*2,
                 self.h-radius*2
             )
-        #ne doit pas être ici
-        self.nbr_people = nbr_people
-        
+            
+        #Je passe les ronds qui représente les gens du réseau
         for i in range(nbr_people):
             coor_x = \
-                self.w/2 - ((self.w-radius*4)/2 * cos((i*(360/nbr_people)-45) * pi/180))
+                self.w/2 - ((self.w-radius*4)/2 * 
+                                        cos((i*(360/nbr_people)-45) * pi/180))
             coor_y = \
-                self.h/2 + ((self.h-radius*4)/2 * sin((i*(360/nbr_people)-45) * pi/180))
+                self.h/2 + ((self.h-radius*4)/2 *
+                                        sin((i*(360/nbr_people)-45) * pi/180))
             self.canva.create_oval(
                             coor_x - radius,
                             coor_y - radius,
                             coor_x + radius,
                             coor_y + radius,
                             fill="black",
-                            activeoutline="red"
-                        )
+                            activeoutline="red",
+                            )
+            self.center_node.append((coor_x,coor_y))
+            Link(self.canva, self.center_node, self.r_canvas)
         
 class Person:
     def __init__(self):
         pass
+        
+class Link:
+    def __init__(self, canva, center_node, r_canvas):
+        self.r_canvas = r_canvas
+        self.center_node = center_node
+        self.canva = canva
+        self.drawn = None
+        self.right_pos = False
+        self.right_pos_end = False
+        self.canva.bind("<Button-1>", self.onStart)
+        self.canva.bind("<B1-Motion>", self.drawing_line)
+        self.canva.bind("<ButtonRelease-1>", self.onEnd)
+        
+    def onStart(self, event):
+        i = 0
+        self.right_pos = False
+        self.start = event
+        self.drawn = None
+        while not self.right_pos and i < len(self.center_node):
+            if self.center_node[i][0] - self.r_canvas <= self.start.x \
+                            <= self.center_node[i][0] + self.r_canvas \
+                            and \
+                            self.center_node[i][1] - self.r_canvas \
+                            <= self.start.y <= self.center_node[i][1] + \
+                            self.r_canvas:
+                self.right_pos = True
+            i += 1
+        
+    def onEnd(self, event):
+        i = 0
+        self.right_pos_end = False
+        self.end = event
+        while not self.right_pos_end and i < len(self.center_node):
+            if self.center_node[i][0] - self.r_canvas <= self.end.x \
+                            <= self.center_node[i][0] + self.r_canvas \
+                            and \
+                            self.center_node[i][1] - self.r_canvas \
+                            <= self.end.y <= self.center_node[i][1] + \
+                            self.r_canvas:
+                self.right_pos_end = True
+            i += 1
+        
+    def drawing_line(self, event):
+        canva = event.widget
+        if self.drawn:
+            canva.delete(self.drawn)
+        if self.right_pos:
+            link_person = canva.create_line(
+                                    self.start.x,
+                                    self.start.y,
+                                    event.x,
+                                    event.y,
+                                    width=2,
+                                    activefill="blue",
+                                    fill="black"
+                                )
+            self.drawn = link_person
         
 class GUI:
     def __init__(self):
