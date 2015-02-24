@@ -28,6 +28,7 @@ class NetworkFrame:
                 self.w-radius*2,
                 self.h-radius*2
             )
+        Link(self.canva, self.center_node, self.r_canvas)
             
         #Je passe les ronds qui représente les gens du réseau
         for i in range(nbr_people):
@@ -45,9 +46,8 @@ class NetworkFrame:
                             fill="black",
                             activeoutline="red",
                             )
-            #Mauvais center_node ... à refaire mais comment ?
-            self.center_node.append((coor_x,coor_y))
-            Link(self.canva, self.center_node, self.r_canvas)
+            if (coor_x, coor_y) not in self.center_node:
+                self.center_node.append((coor_x,coor_y))
         
 class Person:
     def __init__(self):
@@ -55,6 +55,8 @@ class Person:
         
 class Link:
     def __init__(self, canva, center_node, r_canvas):
+        self.link_person = None
+        self.pos_link = []
         self.r_canvas = r_canvas
         self.center_node = center_node
         self.canva = canva
@@ -81,6 +83,7 @@ class Link:
             i += 1
         
     def onEnd(self, event):
+        canva = event.widget
         i = 0
         self.right_pos_end = False
         self.end = event
@@ -93,13 +96,18 @@ class Link:
                             self.r_canvas:
                 self.right_pos_end = True
             i += 1
+        canva.delete(self.link_person)
+        if self.right_pos_end:
+            canva.create_line(
+                        self.center_node[i][0],
+                        self.center_node[i][1]
         
     def drawing_line(self, event):
         canva = event.widget
         if self.drawn:
             canva.delete(self.drawn)
         if self.right_pos:
-            link_person = canva.create_line(
+            self.link_person = canva.create_line(
                                     self.start.x,
                                     self.start.y,
                                     event.x,
@@ -108,7 +116,7 @@ class Link:
                                     activefill="blue",
                                     fill="black"
                                 )
-            self.drawn = link_person
+            self.drawn = self.link_person
         
 class GUI:
     def __init__(self):
@@ -147,6 +155,7 @@ class GUI:
         addpeople_name = StringVar()
         addpeople_name.set("Nom de la personne à ajouter au réseau")
         
+        #/!\ Ajoute un rond même si on annule, ferme la fenetre qui pop /!\
         self.addpeople_button = Button(
                             self.under_canva,
                             text="Ajouter une personne au réseau",
