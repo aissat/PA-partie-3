@@ -101,6 +101,7 @@ class Link:
             canva.create_line(
                         self.center_node[i][0],
                         self.center_node[i][1]
+                        )
         
     def drawing_line(self, event):
         canva = event.widget
